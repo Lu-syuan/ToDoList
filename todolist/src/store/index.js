@@ -7,24 +7,99 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    todos: []
+    // {content:123,done:false},{content:456,done:false},{content:789,done:false}
+    todos: [
+      { content: 123, done: false },
+      { content: 456, done: false },
+      { content: 789, done: false }
+    ]
   },
-  getters: {},
+  getters: {
+    list (state) {
+      return state.todos.map((todo, tId) => {
+        return {
+          todo,
+          tId
+        }
+      })
+    },
+    filterList (state, getters) {
+      return (filter) => {
+        let stauts = null
+        switch (filter) {
+          case 'all':
+            return getters.list
+          case 'active':
+            stauts = false
+            break
+          case 'done':
+            stauts = true
+            break
+        }
+        return getters.list.filter((todo) => {
+          return todo.todo.done === stauts
+        })
+      }
+    }
+  },
+
   mutations: {
-    SET_TODOS (state) {
-      state.todos = STORE.load()
+    SET_TODOS (state, todos) {
+      state.todos = todos
     }
   },
   actions: {
+    CREATE_TODOS ({ commit }, { todo }) {
+      // Calling setItem() with a named key that already exists will silently overwrite the previous value.
+      // 要記得用push後再setItem，不能直接setItem
+
+      // 1 POST
+      const todos = STORE.load()
+      todos.push(todo)
+      STORE.save(todos)
+      // 2 commit mutations
+      commit('SET_TODOS', todos)
+      // 3 return
+      return {
+        tId: todos.length - 1,
+        todo
+      }
+    },
     READ_TODOS ({ commit }) {
       // 1.GET
       const todos = STORE.load()
       // 2. commit mutations
-      commit('SET_TODOS')
+      commit('SET_TODOS', todos)
       // 3.return
       return {
         todos
       }
+    },
+    UPDATE_TODOS ({ commit }, { tId, todo }) {
+      const todos = STORE.load()
+      todos.splice(tId, 1, todo)
+      STORE.save(todos)
+      commit('SET_TODOS', todos)
+      return {
+        tId,
+        todo
+      }
+    },
+    DELETE_TODOS ({ commit }, { tId }) {
+      const todos = STORE.load()
+      const deleteTodos = todos.splice(tId, 1)[0]
+      STORE.save(todos)
+
+      commit('SET_TODOS', todos)
+      return {
+        deleteTodos,
+        tId
+      }
+    },
+    CLEAR_TODOS ({ commit }) {
+      const todos = []
+      STORE.save(todos)
+      commit('SET_TODOS', todos)
     }
   },
   modules: {}
