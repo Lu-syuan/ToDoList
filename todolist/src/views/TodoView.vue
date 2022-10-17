@@ -2,11 +2,7 @@
   <div class="Todo">
     <h1>This is an todo page</h1>
     <p>show {{ filter }}</p>
-    <p>{{ list }}</p>
-
-    <router-link :to="{ name: 'Todo', query: { filter: 'all' } }" replace
-      >all</router-link
-    >
+    <router-link to="/todo" replace>all</router-link>
     |
     <router-link :to="{ name: 'Todo', query: { filter: 'active' } }" replace
       >active</router-link
@@ -20,7 +16,19 @@
       <TodoFilter
         v-for="item of list"
         :todo="item.todo"
-        :key="item.tId"
+        :edit="item.tId === edit"
+        :key="item.tId + item.todo.content"
+        @check="
+          (value) => {
+            checkHandler(item.tId, value)
+          }
+        "
+        @completeEdit="
+          (value) => {
+            completeEditHandler(item.tId, value)
+          }
+        "
+        @editThis="edit = item.tId"
       ></TodoFilter>
     </ul>
   </div>
@@ -32,8 +40,12 @@ import TodoFilter from '../components/TodoFilter.vue'
 export default {
   data () {
     return {
-      filter: 'all' // all, active, done
+      filter: 'all', // all, active, done
+      edit: null
     }
+  },
+  mounted () {
+    this.$store.dispatch('READ_TODOS')
   },
   components: {
     TodoFilter: TodoFilter
@@ -43,11 +55,23 @@ export default {
       return this.$store.getters.filterList(this.filter)
     }
   },
+  methods: {
+    checkHandler (tId, value) {
+      this.$store.dispatch('CHECK_TODOS', { tId, value })
+    },
+    completeEditHandler (tId, todo) {
+      this.edit = null
+      // console.log(value)
+      this.$store.dispatch('UPDATE_TODOS', { tId, todo })
+    }
+  },
+
   watch: {
     $route: {
       immediate: true,
       handler: function (route) {
-        this.filter = route.query.filter
+        this.edit = null
+        this.filter = route.query.filter || 'all'
       }
     }
   }

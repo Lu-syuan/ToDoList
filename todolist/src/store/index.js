@@ -8,11 +8,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     // {content:123,done:false},{content:456,done:false},{content:789,done:false}
-    todos: [
-      { content: 123, done: false },
-      { content: 456, done: true },
-      { content: 789, done: false }
-    ]
+    todos: []
   },
   getters: {
     list (state) {
@@ -77,7 +73,9 @@ export default new Vuex.Store({
     },
     UPDATE_TODOS ({ commit }, { tId, todo }) {
       const todos = STORE.load()
-      todos.splice(tId, 1, todo)
+      console.log(todo)
+      todos[tId].content = todo
+      // todos.splice(tId, 1, todos[tId])
       STORE.save(todos)
       commit('SET_TODOS', todos)
       return {
@@ -96,6 +94,17 @@ export default new Vuex.Store({
         tId
       }
     },
+    CHECK_TODOS ({ commit }, { tId, value }) {
+      const todos = STORE.load()
+      todos[tId].done = value
+      STORE.save(todos)
+      commit('SET_TODOS', todos)
+      return {
+        todos,
+        tId
+      }
+    },
+
     CLEAR_TODOS ({ commit }) {
       const todos = []
       STORE.save(todos)
