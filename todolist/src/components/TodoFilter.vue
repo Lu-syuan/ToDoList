@@ -3,6 +3,7 @@
     <template v-if="!edit">
       <input type="checkbox" v-model="done" />{{ todo.content }}
       <button @click="$emit('editThis')">編輯</button>
+      <button @click="$emit('deleteThis')">刪除</button>
     </template>
     <template v-else>
       <input type="text" v-model="editContent" />

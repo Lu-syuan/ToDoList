@@ -1,6 +1,11 @@
 <template>
   <div class="Todo">
     <h1>This is an todo page</h1>
+    <input
+      type="text"
+      @keyup.enter="creatTodoHandler(creatTodo)"
+      v-model="creatTodo"
+    />
     <p>show {{ filter }}</p>
     <router-link to="/todo" replace>all</router-link>
     |
@@ -29,6 +34,7 @@
           }
         "
         @editThis="edit = item.tId"
+        @deleteThis="deleteHandler(item.tId)"
       ></TodoFilter>
     </ul>
   </div>
@@ -41,7 +47,8 @@ export default {
   data () {
     return {
       filter: 'all', // all, active, done
-      edit: null
+      edit: null,
+      creatTodo: ''
     }
   },
   mounted () {
@@ -61,8 +68,14 @@ export default {
     },
     completeEditHandler (tId, todo) {
       this.edit = null
-      // console.log(value)
       this.$store.dispatch('UPDATE_TODOS', { tId, todo })
+    },
+    creatTodoHandler (todo) {
+      this.$store.dispatch('CREATE_TODOS', { todo })
+      this.creatTodo = ''
+    },
+    deleteHandler (tId) {
+      this.$store.dispatch('DELETE_TODOS', { tId })
     }
   },
 

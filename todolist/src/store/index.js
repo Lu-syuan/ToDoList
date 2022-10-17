@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import localStorage from '../modules/LocalStorage'
 
 const STORE = localStorage('todo-vue')
+// STORE.save([])
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -12,6 +13,10 @@ export default new Vuex.Store({
   },
   getters: {
     list (state) {
+      if (window.localStorage.getItem('todo-vue') === null) {
+        STORE.save([])
+      }
+
       return state.todos.map((todo, tId) => {
         return {
           todo,
@@ -44,6 +49,9 @@ export default new Vuex.Store({
       state.todos = todos
     }
   },
+  // {content:123,done:false}
+  // todo:{content:"",
+  //        done:false}
   actions: {
     CREATE_TODOS ({ commit }, { todo }) {
       // Calling setItem() with a named key that already exists will silently overwrite the previous value.
@@ -51,7 +59,8 @@ export default new Vuex.Store({
 
       // 1 POST
       const todos = STORE.load()
-      todos.push(todo)
+      todos.push({ content: todo, done: false })
+      // todos.push(todo)
       STORE.save(todos)
       // 2 commit mutations
       commit('SET_TODOS', todos)
