@@ -82,7 +82,7 @@ export default new Vuex.Store({
     },
     UPDATE_TODOS ({ commit }, { tId, todo }) {
       const todos = STORE.load()
-      console.log(todo)
+      // console.log(todo)
       todos[tId].content = todo
       // todos.splice(tId, 1, todos[tId])
       STORE.save(todos)
